@@ -45,7 +45,8 @@ class _HomeScreenState extends State<HomeScreen> {
           userPoints += points;
         });
       }),
-      RewardsPage(userPoints: userPoints),
+      const NewsPage(),
+      AboutPage(userPoints: userPoints),
     ]);
   }
 
@@ -79,14 +80,14 @@ class _HomeScreenState extends State<HomeScreen> {
       body: _pages[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
+        type: BottomNavigationBarType.fixed,
         backgroundColor: Colors.black87,
         selectedItemColor: Colors.greenAccent,
         unselectedItemColor: Colors.grey,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
-            // نوێکردنەوەی خاڵەکان لە پەڕەی خەڵاتدا ئەگەر گۆڕانکاری بەسەردا هات
-            _pages[2] = RewardsPage(userPoints: userPoints);
+            _pages[3] = AboutPage(userPoints: userPoints);
           });
         },
         items: const [
@@ -99,8 +100,12 @@ class _HomeScreenState extends State<HomeScreen> {
             label: 'پێشبینی',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.card_giftcard),
-            label: 'خەڵات',
+            icon: Icon(Icons.article),
+            label: 'هەواڵ',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.info),
+            label: 'دەربارە',
           ),
         ],
       ),
@@ -279,7 +284,7 @@ class _PredictionsPageState extends State<PredictionsPage> {
                                 setState(() {
                                   _hasVoted = true;
                                 });
-                                widget.onAddPoints(50); // زیادکردنی 50 خاڵ
+                                widget.onAddPoints(50);
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(content: Text('پێشبینیەکەت بە سەرکەوتوویی تۆمارکرا و 50 خاڵت پێدرا!')),
                                 );
@@ -298,11 +303,22 @@ class _PredictionsPageState extends State<PredictionsPage> {
   }
 }
 
-// 3. بەشی خەڵاتەکان
-class RewardsPage extends StatelessWidget {
-  final int userPoints;
+// 3. بەشی هەواڵە وەرزشییەکان
+class NewsPage extends StatelessWidget {
+  const NewsPage({super.key});
 
-  const RewardsPage({super.key, required this.userPoints});
+  final List<Map<String, String>> newsList = const [
+    {
+      'title': 'دەستپێکردنەوەی خولی یانە پاڵەوانەکانی ئەوروپا',
+      'date': 'ئەمڕۆ',
+      'desc': 'ئەمشەو چەندین یاری بەهێز لە چامپیۆنزلیگ بەڕێوەدەچن و یانە گەورەکان ڕووبەڕووی یەکدی دەبنەوە.'
+    },
+    {
+      'title': 'ئامادەکاری بۆ جامی نەتەوەکانی ئەوروپا',
+      'date': 'دوێنێ',
+      'desc': 'هەڵبژاردەکان لیستی سەرەتایی یاریزانانی خۆیان ڕاگەیاند بۆ مۆندیالی داهاتوو.'
+    },
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -312,49 +328,114 @@ class RewardsPage extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const Text(
-            'سیستەمی خەڵات و بەدیهێنان',
+            'دوایین هەواڵە وەرزشییەکان',
             style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 15),
+          Expanded(
+            child: ListView.builder(
+              itemCount: newsList.length,
+              itemBuilder: (context, index) {
+                return Card(
+                  color: Colors.grey[850],
+                  margin: const EdgeInsets.only(bottom: 12),
+                  child: Padding(
+                    padding: const EdgeInsets.all(14.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                newsList[index]['title']!,
+                                style: const TextStyle(color: Colors.greenAccent, fontSize: 16, fontWeight: FontWeight.bold),
+                              ),
+                            ),
+                            Text(
+                              newsList[index]['date']!,
+                              style: const TextStyle(color: Colors.grey, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Text(
+                          newsList[index]['desc']!,
+                          style: const TextStyle(color: Colors.white70, fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// 4. بەشی دەربارە و پەیوەندی
+class AboutPage extends StatelessWidget {
+  final int userPoints;
+
+  const AboutPage({super.key, required this.userPoints});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ListView(
+        children: [
+          const Text(
+            'دەربارەی ئەپڵیکەیشن',
+            style: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 15),
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.green.withOpacity(0.1),
+              color: Colors.grey[850],
               borderRadius: BorderRadius.circular(15),
-              border: Border.all(color: Colors.green),
+              border: Border.all(color: Colors.green.withOpacity(0.5)),
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            child: const Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'کۆی خاڵە بەدەستهاتووەکانت:',
-                  style: TextStyle(color: Colors.white, fontSize: 16),
-                ),
                 Text(
-                  '$userPoints خاڵ',
-                  style: const TextStyle(color: Colors.greenAccent, fontSize: 20, fontWeight: FontWeight.bold),
+                  'Kurd Sport Live ⚽️📺',
+                  style: TextStyle(color: Colors.greenAccent, fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(height: 10),
+                Text(
+                  'ئەم ئەپە دروستکراوە بۆ پەخشکردنی یارییە وەرزشییەکان، پێشبینیکردن و کۆکردنەوەی خاڵ، لەگەڵ خوێندنەوەی دوایین هەواڵە وەرزشییەکان بە شێوازێکی مۆدێرن و خێرا بە بەکارهێنانی فلاتەر.',
+                  style: TextStyle(color: Colors.white70, fontSize: 14, height: 1.4),
                 ),
               ],
             ),
           ),
           const SizedBox(height: 20),
           const Text(
-            'دیارییە بەردەستەکان:',
-            style: TextStyle(color: Colors.grey, fontSize: 16),
+            'پەیوەندی کردن بە بەڕێوەبەر:',
+            style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 10),
-          Expanded(
-            child: ListView(
-              children: const [
-                Card(
-                  color: Colors.grey,
-                  child: ListTile(
-                    leading: Icon(Icons.card_giftcard, color: Colors.amber),
-                    title: Text('بەشداریکردن لە تیروپشکدا', style: TextStyle(fontWeight: FontWeight.bold)),
-                    subtitle: Text('پێویستە 200 خاڵت هەبێت'),
-                  ),
-                ),
-              ],
+          Card(
+            color: Colors.grey[850],
+            child: const ListTile(
+              leading: Icon(Icons.email, color: Colors.greenAccent),
+              title: Text('پۆستی ئەلیکترۆنی', style: TextStyle(color: Colors.white)),
+              subtitle: Text('support@kurdsport.com', style: TextStyle(color: Colors.grey)),
+            ),
+          ),
+          Card(
+            color: Colors.grey[850],
+            child: const ListTile(
+              leading: Icon(Icons.telegram, color: Colors.blueAccent),
+              title: Text('کەناڵی تێلیگرام', style: TextStyle(color: Colors.white)),
+              subtitle: Text('@KurdSportLive', style: TextStyle(color: Colors.grey)),
             ),
           ),
         ],
